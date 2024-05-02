@@ -1,0 +1,4 @@
+/root/sylar-project/sylar/CMakeFiles/sylar.dir
+/root/sylar-project/sylar/CMakeFiles/test.dir
+/root/sylar-project/sylar/CMakeFiles/test_config.dir
+/root/sylar-project/sylar/CMakeFiles/test_thread.dir

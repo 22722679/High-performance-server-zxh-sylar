@@ -1,0 +1,49 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+DEBUG	log.h	/^        DEBUG = 1;$/;"	e	enum:sylar::LogLevel::Level
+ERROR	log.h	/^        ERROR = 4;$/;"	e	enum:sylar::LogLevel::Level
+FATAL	log.h	/^        FATAL = 5;$/;"	e	enum:sylar::LogLevel::Level
+FileLogAppender	log.h	/^class FileLogAppender : public LogAppender{$/;"	c	namespace:sylar
+INFO	log.h	/^        INFO = 2;$/;"	e	enum:sylar::LogLevel::Level
+Level	log.h	/^    enum Level {$/;"	g	class:sylar::LogLevel
+LogAppender	log.h	/^class LogAppender{$/;"	c	namespace:sylar
+LogEvent	log.h	/^class LogEvent{$/;"	c	namespace:sylar
+LogFormatter	log.h	/^class LogFormatter{$/;"	c	namespace:sylar
+LogLevel	log.h	/^class LogLevel {$/;"	c	namespace:sylar
+Logger	log.cc	/^Logger::Logger(const std::string& name)$/;"	f	class:sylar::Logger
+Logger	log.h	/^class Logger{$/;"	c	namespace:sylar
+StdoutLogAppender	log.h	/^class StdoutLogAppender : public LogAppender {$/;"	c	namespace:sylar
+WARN	log.h	/^        WARN = 3;$/;"	e	enum:sylar::LogLevel::Level
+_SYLAR_LOG_H_	log.h	2;"	d
+addAppender	log.cc	/^void Logger::addAppender(LogAppender::ptr appender){$/;"	f	class:sylar::Logger
+debug	log.cc	/^void Logger::debug(LogEvent::ptr event){$/;"	f	class:sylar::Logger
+delAppender	log.cc	/^void Logger::delAppender(LogAppender::ptr appender){$/;"	f	class:sylar::Logger
+error	log.cc	/^void Logger::error(LogEvent::ptr event){$/;"	f	class:sylar::Logger
+fatal	log.cc	/^void Logger::fatal(LogEvent::ptr event){$/;"	f	class:sylar::Logger
+getLevel	log.h	/^	LogLevel::Level getLevel() const   { return m_level; }$/;"	f	class:sylar::Logger
+info	log.cc	/^void Logger::info(LogEvent::ptr event){$/;"	f	class:sylar::Logger
+log	log.cc	/^void Logger::log(LogLevel::Level level, LogEvent::ptr event){$/;"	f	class:sylar::Logger
+m_appenders	log.h	/^	std::list<LogAppender::ptr>	m_appenders;	\/\/Appender集合$/;"	m	class:sylar::Logger
+m_content	log.h	/^	std::string m_content;$/;"	m	class:sylar::LogEvent
+m_elapse	log.h	/^	uint32_t m_elapse = 0;			\/\/程序启动开始到现在的毫秒数$/;"	m	class:sylar::LogEvent
+m_fiberId	log.h	/^	uint32_t m_fiberId =0;			\/\/协程id$/;"	m	class:sylar::LogEvent
+m_file	log.h	/^	const char* m_file = nullptr;	\/\/文件名$/;"	m	class:sylar::LogEvent
+m_level	log.h	/^	LogLevel::Level m_level;			\/\/日志级别$/;"	m	class:sylar::Logger
+m_level	log.h	/^	LogLevel::Level m_level;$/;"	m	class:sylar::LogAppender
+m_line	log.h	/^	int32_t m_line = 0;				\/\/行号$/;"	m	class:sylar::LogEvent
+m_name	log.h	/^	std::string m_name;				\/\/日志名称$/;"	m	class:sylar::Logger
+m_threadId	log.h	/^ 	uint32_t m_threadId = 0;		\/\/线程id$/;"	m	class:sylar::LogEvent
+m_time	log.h	/^	uint64_t m_time;				\/\/时间戳$/;"	m	class:sylar::LogEvent
+ptr	log.h	/^	typedef std::shared_ptr<LogEvent> ptr;$/;"	t	class:sylar::LogEvent
+ptr	log.h	/^	typedef std::shared_ptr<LogFormatter> ptr;$/;"	t	class:sylar::LogFormatter
+ptr	log.h	/^	typedef std::shared_ptr<Logger> ptr;$/;"	t	class:sylar::Logger
+ptr	log.h	/^    typedef std::shared_ptr<LogAppender> ptr;$/;"	t	class:sylar::LogAppender
+setLevel	log.h	/^	void setLevel(LogLevel::Level val) { m_level = val; }$/;"	f	class:sylar::Logger
+sylar	log.cc	/^namespace sylar {$/;"	n	file:
+sylar	log.h	/^namespace sylar{$/;"	n
+warn	log.cc	/^void Logger::warn(LogEvent::ptr event){$/;"	f	class:sylar::Logger
+~LogAppender	log.h	/^	virtual ~LogAppender() {}$/;"	f	class:sylar::LogAppender
