@@ -1,4 +1,7 @@
 /root/sylar-project/sylar/CMakeFiles/sylar.dir
 /root/sylar-project/sylar/CMakeFiles/test.dir
 /root/sylar-project/sylar/CMakeFiles/test_config.dir
+/root/sylar-project/sylar/CMakeFiles/test_fiber.dir
+/root/sylar-project/sylar/CMakeFiles/test_scheduler.dir
 /root/sylar-project/sylar/CMakeFiles/test_thread.dir
+/root/sylar-project/sylar/CMakeFiles/test_util.dir

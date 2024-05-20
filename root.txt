@@ -1,0 +1,18 @@
+2024-05-02 19:38:02		name = class.vec_map	 description = system person	 typename = St3mapISsSt6vectorI6PersonSaIS1_EESt4lessISsESaISt4pairIKSsS3_EEE	 value = 
+2024-05-02 19:38:02		name = class.map	 description = system person	 typename = St3mapISs6PersonSt4lessISsESaISt4pairIKSsS0_EEE	 value = 
+2024-05-02 19:38:02		name = class.person	 description = system person	 typename = 6Person	 value = name: ""
+age: 0
+sex: false
+2024-05-02 19:38:02		name = logs	 description = logs config	 typename = St3setIN5sylar9LogDefineESt4lessIS1_ESaIS1_EE	 value = - name: root
+  level: INFO
+  appenders:
+    - type: FileLogAppender
+      file: /root/sylar-project/sylar/root.txt
+    - type: StdoutLogAppender
+- name: system
+  level: DEBUG
+  appenders:
+    - type: FileLogAppender
+      file: /root/sylar-project/sylar/system.txt
+      formatter: "%d%T[%p]%T%m%n"
+    - type: StdoutLogAppender

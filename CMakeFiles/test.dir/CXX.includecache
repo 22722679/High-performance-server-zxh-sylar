@@ -37,6 +37,10 @@ unordered_set
 -
 functional
 -
+thread.h
+/root/sylar-project/sylar/sylar/thread.h
+log.h
+/root/sylar-project/sylar/sylar/log.h
 
 /root/sylar-project/sylar/sylar/log.cc
 log.h
@@ -110,6 +114,10 @@ unistd.h
 stdio.h
 -
 stdint.h
+-
+string
+-
+vector
 -
 
 /root/sylar-project/sylar/tests/test.cc

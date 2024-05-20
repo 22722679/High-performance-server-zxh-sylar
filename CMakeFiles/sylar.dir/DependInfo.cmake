@@ -5,7 +5,9 @@ SET(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 SET(CMAKE_DEPENDS_CHECK_CXX
   "/root/sylar-project/sylar/sylar/config.cc" "/root/sylar-project/sylar/CMakeFiles/sylar.dir/sylar/config.cc.o"
+  "/root/sylar-project/sylar/sylar/fiber.cc" "/root/sylar-project/sylar/CMakeFiles/sylar.dir/sylar/fiber.cc.o"
   "/root/sylar-project/sylar/sylar/log.cc" "/root/sylar-project/sylar/CMakeFiles/sylar.dir/sylar/log.cc.o"
+  "/root/sylar-project/sylar/sylar/scheduler.cc" "/root/sylar-project/sylar/CMakeFiles/sylar.dir/sylar/scheduler.cc.o"
   "/root/sylar-project/sylar/sylar/thread.cc" "/root/sylar-project/sylar/CMakeFiles/sylar.dir/sylar/thread.cc.o"
   "/root/sylar-project/sylar/sylar/util.cc" "/root/sylar-project/sylar/CMakeFiles/sylar.dir/sylar/util.cc.o"
   )

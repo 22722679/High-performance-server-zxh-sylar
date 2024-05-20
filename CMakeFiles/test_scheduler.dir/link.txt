@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic -O0 -ggdb -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function -Wno-builtin-macro-redefined    CMakeFiles/test_scheduler.dir/tests/test_scheduler.cc.o  -o bin/test_scheduler  -L/root/sylar-project/sylar/include/build -rdynamic lib/libsylar.so -lpthread -lyaml-cpp -Wl,-rpath,/root/sylar-project/sylar/include/build:/root/sylar-project/sylar/lib 

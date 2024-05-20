@@ -5,7 +5,7 @@
 namespace sylar {
 
 static thread_local Thread* t_thread = nullptr;     //线程局部变量，指向当前线程
-static thread_local std::string t_thread_name = "UNKONW";
+static thread_local std::string t_thread_name = "UNKNOW";
 
 static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("system");
 
