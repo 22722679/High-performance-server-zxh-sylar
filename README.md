@@ -6,9 +6,9 @@
   - Cmake
 
 # 项目路径
-  - bin              —— 二进制
-  - build            —— 中间文件路径
-  - cmake            —— cmake函数文件夹
+  - bin\t—— 二进制
+  - build\t—— 中间文件路径
+  - cmake\t—— cmake函数文件夹
   - CmakeLists.txt   —— Cmake定义文件
   - lib              —— 库的输出路径
   - Makefile         —— 编码规范
