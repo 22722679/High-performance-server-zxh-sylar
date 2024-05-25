@@ -40,7 +40,24 @@
 |—— cmake
 |    └—— utils.cmake(重新自定义的宏文件)
 |—— include
-|
+|—— lib
+|—— sylar(源代码文件)
+|    |—— config.cc(配置源文件)
+|    |—— config.h(配置头文件)
+|    |—— fiber.cc(协程源文件)
+|    |—— fiber.h(协程头文件)
+|    |—— log.cc(日志源文件)
+|    |—— log.h(日志头文件)
+|    |—— macro.h(断言定义)
+|    |—— scheduler.cc(协程调度器源文件)
+|    |—— scheduler.h(协程调度器头文件)
+|    |—— singleton.h()
+|    |—— sylar.h(总头文件)
+|    |—— thread.cc(线程源文件)
+|    |—— thread.h(线程头文件)
+|    |—— util.cc(自定义工具)
+|    └—— util.h
+```
 
 
 
