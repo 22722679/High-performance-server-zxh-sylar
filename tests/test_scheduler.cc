@@ -24,3 +24,5 @@ int main(int argc, char** argv){
     SYLAR_LOG_INFO(g_logger) << "over";
     return 0;
 }
+
+
