@@ -17,10 +17,10 @@
   - other *.txt(测试日志模块的输出文件）
 
 ## 目前开发进度
-  - [日志系统](#日志系统)
-  - [配置系统](#配置系统)
-  - [线程库和锁](#线程库和锁)
-  - [协程库](#协程库)
+  - .[日志系统](#日志系统)
+  - .[配置系统](#配置系统)
+  - .[线程库和锁](#线程库和锁)
+  - .[协程库](#协程库)
   -   ....
 ## 项目作者
 **张小虎**
@@ -71,10 +71,10 @@
 |—— CMakeLists.txt(cmake配置)
 └—— Makefile(make配置)
 ```
+### 日志系统及配置系统类图
+   ![zxh-服务器框架类图](https://github.com/22722679/High-performance-server-zxh-sylar/assets/116802544/16e25211-8566-4bf8-b7f8-ac53a3dc9f93)
 
 ### 日志系统
-    [![Watch the video] (https://github.com/22722679/High-performance-server-zxh-sylar/assets/116802544/aed6d509-6cc9-4efa-91db-5bc9cf9067d4)]
-
 ### 配置系统
 ### 线程库和锁
 ### 协程库
