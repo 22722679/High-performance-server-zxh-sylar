@@ -51,12 +51,23 @@
 |    |—— macro.h(断言定义)
 |    |—— scheduler.cc(协程调度器源文件)
 |    |—— scheduler.h(协程调度器头文件)
-|    |—— singleton.h()
+|    |—— singleton.h(获取线程模版)
 |    |—— sylar.h(总头文件)
 |    |—— thread.cc(线程源文件)
 |    |—— thread.h(线程头文件)
 |    |—— util.cc(自定义工具)
 |    └—— util.h
+|—— tests
+|    |—— test.cc(日志测试)
+|    |—— test_config.cc(配置系统测试)
+|    |—— test_fiber.cc(协程测试)
+|    |—— test_scheduler.cc(协程调度器测试)
+|    |—— test_thread.cc(线程测试)
+|    └—— test_util.cc(断言测试)
+|—— other *.txt(测试日志模块的输出文件）
+|—— CMakeCache.txt
+|—— CMakeLists.txt(cmake配置)
+└—— Makefile(make配置)
 ```
 
 
