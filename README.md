@@ -73,7 +73,7 @@
 ```
 
 ### 日志系统
-    ![image](https://github.com/22722679/High-performance-server-zxh-sylar/assets/116802544/aed6d509-6cc9-4efa-91db-5bc9cf9067d4)
+    [![image](https://github.com/22722679/High-performance-server-zxh-sylar/assets/116802544/aed6d509-6cc9-4efa-91db-5bc9cf9067d4)]
 
 ### 配置系统
 ### 线程库和锁
