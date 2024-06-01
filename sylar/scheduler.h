@@ -60,6 +60,9 @@ protected:
     virtual void idle();        //空闲状态执行, 没有任务时，一段时间后清空一下缓存
     
     void SetThis();            //把当前线程的scheduler放进来
+    
+    bool hasIdleThreads() { return m_idleThreadCount > 0; }
+    
 private:
     template<class FiberOrCb>
     bool scheduleNoLock(FiberOrCb fc, int thread) {

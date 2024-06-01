@@ -22,6 +22,7 @@ IOManager::FdContext::EventContext& IOManager::FdContext::getContext(IOManager::
             SYLAR_ASSERT2(false,"getContext");
     }
 }
+
 void IOManager::FdContext::resetContext(EventContext& ctx){      //清理掉Context里边的协程对象，回调事件和协程调度器等任务
     ctx.scheduler = nullptr;
     ctx.fiber.reset();
@@ -40,6 +41,8 @@ void IOManager::FdContext::triggerEvent(IOManager::Event event) {
     ctx.scheduler = nullptr;
     return ;
 }
+
+
 
 IOManager::IOManager(size_t threads, bool use_caller, const std::string &name) 
     :Scheduler(threads, use_caller,name){
@@ -210,7 +213,7 @@ bool IOManager::cancelEvent(int fd, Event event) {      // 根据条件来触发
         return false;
     }
 
-    FdContext::EventContext& event_ctx = fd_ctx->getContext(event);
+    //FdContext::EventContext& event_ctx = fd_ctx->getContext(event);
     fd_ctx->triggerEvent(event);
     --m_pendingEventCount;
     return true;
@@ -258,5 +261,103 @@ IOManager IOManager::*GetThis(){   // 获取当前的IOManager
     return dynamic_cast<IOManager*>(Scheduler::GetThis());
 }
 
+//协程调度器框架的核心
+void IOManager::tickle() {
+    if(hasIdleThreads()) {      //空闲线程说明他已经陷入的idle里了，这个消息来唤醒它回来
+        return ;               //如果没有空闲的线程，则跳过
+    }
+    int rt = write(m_tickleFds[1],"T", 1);   //写入IO数据,返回值为长度
+    SYLAR_ASSERT(rt == 1);
+
+}
+
+bool IOManager::stopping() {
+    return Scheduler::stopping()            //调度器正在stopping
+        && m_pendingEventCount == 0;         //未处理的消息为0
+}
+
+void IOManager::idle() {
+    epoll_event* events = new epoll_event[64]();
+    std::shared_ptr<epoll_event>   shared_events(events,[](epoll_event* ptr){   //C++11不支持智能指针传递数组，但C++14支持,这里是用析构的方法实现存储
+        delete[] events;
+    });
+
+    while(true) {
+        if(stopping()){
+            SYLAR_LOG_INFO(g_logger) << "name = " << m_name << " idle stoppint exit";
+            break;
+        }
+
+        //epoll_wait
+        int rt = 0;
+        do {
+            static const int MAX_TIMEOUT = 5000;                //毫秒级的精度
+            rt = epoll_wait(m_epfd, events, 64, MAX_TIMEOUT);  //如果没有事件回来，它也会被唤醒
+
+            if(rt < 0 && errno == EINTR) {
+
+            } else {
+                break;
+            }
+        } while(true);
+
+        for(int i=0; i < rt ;++i){
+            epoll_event& event = events[i];
+            if(event.data.fd == m_tickleFds[0]) {
+                uint8_t dummy;
+                while(read(m_tickleFds[0],&dummy,1));    //必须读干净，不然不会通知了
+                continue;
+            }
+
+            FdContext* fd_ctx = event.data.ptr;
+            FdContext::MutexType::Lock lock(fd_ctx->m_mutex);
+            if(event.events && (EPOLLERR | EPOLLHUP)) {      //如果是错误或者是中断的话，就需要修改events
+                event.events |= EPOLLIN | EPOLLOUT;
+            }
+
+            int real_events = NONE;
+            if(event.events & EPOLLIN) {
+                real_events |= READ;
+            }
+            if(event.events & EPOLLOUT) {
+                real_events |= WRITE;
+            }
+
+            if((fd_ctx->events & real_events) == NONE) {
+                continue;
+            }
+
+            int left_events = (fd_ctx->events & ~real_events);      //剩余事件
+            int op = left_events ? EPOLL_CTL_MOD : EPOLL_CTL_DEL;
+            event.events = EPOLLET | left_events;
+
+            int rt2 = epoll_ctl(m_epfd, op, fd_ctx->fd, &event);
+            if(rt2) {
+                SYLAR_LOG_ERROR(g_logger) << " epoll_ctl (" << m_epfd << ", "
+                        << op << "," << fd_ctx->fd << "," << event.events << "):"        // op操作名称,fd操作对象的fd, epevent.events事件
+                        << rt2 << " (" << errno << ") (" << strerror(errno) << ")"; // rt为ctl的返回值,errno为系统错误
+                    continue;
+            }
+
+            if(real_events & READ) {
+                fd_ctx->triggerEvent(READ);
+                --m_pendingEventCount;         //记录事件数量
+            }
+            if(real_events & WRITE) {
+                fd_ctx->triggerEvent(WRITE);
+                --m_pendingEventCount;
+            }
+        }
+
+        //idle处理完一个回合后，应该把控制权
+        //让出来，让出到协程调度框架里,因为有的事件需要到外部处理
+        Fiber::ptr cur = Fiber::GetThis();
+        auto raw_ptr = cur.get();
+        cur.reset();
+
+        raw_ptr->swapOut();        
+        //在每次while循环处理事件结束后，让出执行时间，再回到协程调度器里面
+    }
+}
 
 }
