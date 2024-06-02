@@ -2,6 +2,7 @@
 #define __SYLAR_IOMANAGER_H__
 
 #include "scheduler.h"
+#include "time.h"
 
 namespace sylar {
 
@@ -12,8 +13,8 @@ public:
 
     enum Event {
         NONE = 0x0,
-        READ = 0x1,
-        WRITE = 0x4
+        READ = 0x1,         //EPOLLIN
+        WRITE = 0x4,        //EPOLLOUT
     };
 
 private:
@@ -33,7 +34,7 @@ private:
         EventContext read;              //读事件
         EventContext write;             //写事件
         int fd = 0;                     //事件关联的句柄
-        Event m_events = NONE;          //已经注册的事件
+        Event m_events = NONE;            //已经注册的事件
         MutexType mutex;                
     };
 
@@ -51,9 +52,9 @@ public:
     static IOManager* GetThis();        //获取当前的IOManager
 
 protected:
-    void tickle() override;
-    bool stopping() override;
-    void idle() override;
+    void tickle() override;     //当外面有协程需要执行时，就会触发该方法
+    bool stopping() override;   //决定协程调度模块是否应该终止
+    void idle() override;       //如果没有协程需要执行时，会陷入该方法（陷入epoll_wait里，去做epoll_wait）
 
     void contextResize(size_t size);
 private:

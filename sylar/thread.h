@@ -197,7 +197,7 @@ private:
 //验证加锁和不加锁的区别，新建一个实际不加锁的读写锁类
 class NullRWMutex {
 public:
-    typedef ReadScopedLockImpl<NullRWMutex> ReadLock;
+    //typedef ReadScopedLockImpl<NullRWMutex> ReadLock;
     typedef WriteScopedLockImpl<NullRWMutex> WriteLock;
 
     NullRWMutex() {}

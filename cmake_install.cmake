@@ -42,4 +42,3 @@ FILE(WRITE "/root/sylar-project/sylar/${CMAKE_INSTALL_MANIFEST}" "")
 FOREACH(file ${CMAKE_INSTALL_MANIFEST_FILES})
   FILE(APPEND "/root/sylar-project/sylar/${CMAKE_INSTALL_MANIFEST}" "${file}\n")
 ENDFOREACH(file)
-

@@ -156,8 +156,7 @@ void Scheduler::SetThis() {
 }
 
 void Scheduler::run() {
-    SYLAR_LOG_INFO(g_logger) << "run";
-    
+    SYLAR_LOG_INFO(g_logger) << m_name << "run";
     SetThis();          //把当前线程的scheduler放进来
 
     if(sylar::GetThreadId() != m_rootThread) {
@@ -247,6 +246,7 @@ void Scheduler::run() {
             //如果这次执行有任务的话就不执行idle了，直到没有任务执行的时候，才去执行idle
             if(idle_fiber->getState() == Fiber::TERM) {
                 SYLAR_LOG_INFO(g_logger) << "idle fiber term";
+                tickle();
                 break;
             }
 

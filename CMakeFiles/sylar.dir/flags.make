@@ -10,6 +10,8 @@ CXX_DEFINES = -Dsylar_EXPORTS
 
 # Custom defines: CMakeFiles/sylar.dir/sylar/fiber.cc.o_DEFINES = __FILE__="sylar/fiber.cc"
 
+# Custom defines: CMakeFiles/sylar.dir/sylar/iomanager.cc.o_DEFINES = __FILE__="sylar/iomanager.cc"
+
 # Custom defines: CMakeFiles/sylar.dir/sylar/log.cc.o_DEFINES = __FILE__="sylar/log.cc"
 
 # Custom defines: CMakeFiles/sylar.dir/sylar/scheduler.cc.o_DEFINES = __FILE__="sylar/scheduler.cc"

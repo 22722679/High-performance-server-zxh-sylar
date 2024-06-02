@@ -5,8 +5,8 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
-#include <unistd.h>
 #include <string.h> 
+#include <unistd.h>
 
 namespace sylar {
 
@@ -21,6 +21,7 @@ IOManager::FdContext::EventContext& IOManager::FdContext::getContext(IOManager::
         default:
             SYLAR_ASSERT2(false,"getContext");
     }
+    throw std::invalid_argument("getContext invalid event");
 }
 
 void IOManager::FdContext::resetContext(EventContext& ctx){      //清理掉Context里边的协程对象，回调事件和协程调度器等任务
@@ -30,8 +31,8 @@ void IOManager::FdContext::resetContext(EventContext& ctx){      //清理掉Cont
 }
 
 void IOManager::FdContext::triggerEvent(IOManager::Event event) {
-    SYLAR_ASSERT(events & event);
-    events = (Event)(events & ~event);
+    SYLAR_ASSERT(m_events & event);
+    m_events = (Event)(m_events & ~event);
     EventContext& ctx = getContext(event);
     if(ctx.cb) {
         ctx.scheduler->schedule(&ctx.cb);
@@ -50,7 +51,7 @@ IOManager::IOManager(size_t threads, bool use_caller, const std::string &name)
         SYLAR_ASSERT(m_epfd > 0);
 
         int rt = pipe(m_tickleFds);
-        SYLAR_ASSERT(rt);
+        SYLAR_ASSERT(!rt);
 
         epoll_event event;            //epoll的事件结构体
         memset(&event, 0, sizeof(epoll_event));
@@ -59,10 +60,10 @@ IOManager::IOManager(size_t threads, bool use_caller, const std::string &name)
 
         //异步
         rt = fcntl(m_tickleFds[0], F_SETFL, O_NONBLOCK);    //fcntl用于修改句柄属性
-        SYLAR_ASSERT(rt);
+        SYLAR_ASSERT(!rt);
 
         rt = epoll_ctl(m_epfd, EPOLL_CTL_ADD, m_tickleFds[0], &event);
-        SYLAR_ASSERT(rt);
+        SYLAR_ASSERT(!rt);
 
         contextResize(32);
 
@@ -96,33 +97,33 @@ void IOManager::contextResize(size_t size) {  //分配空间大一点，从而�
 
 // 0 success, -1 error
 //添加事件的方法
-int IOManager::addEvent(int fd, Event event, std::function<void()> cb = nullptr) {
+int IOManager::addEvent(int fd, Event event, std::function<void()> cb) {
     FdContext* fd_ctx = nullptr;
     RWMutexType::ReadLock lock(m_mutex);
     
-    if(m_fdContexts.size() > fd) {   //说明空间已经分配好了
+    if((int)m_fdContexts.size() > fd) {   //说明空间已经分配好了
         fd_ctx = m_fdContexts[fd];
         lock.unlock();
     }else {
         lock.unlock();
         RWMutexType::WriteLock lock2(m_mutex);
-        contextResize(m_fdContexts.size() * 1.5);
+        contextResize(fd * 1.5);
         fd_ctx = m_fdContexts[fd];
     }
 
-    FdContext::Mutex::Lock lock2(fd_ctx->mutex);
-    if(fd_ctx->events & event) {       //防止多次执行同一个任务
+    FdContext::MutexType::Lock lock2(fd_ctx->mutex);
+    if(fd_ctx->m_events & event) {       //防止多次执行同一个任务
         SYLAR_LOG_ERROR(g_logger) << "addEvent assert fd = " << fd
                     <<  " event = " << event
-                    <<  " fd_event = " << fd_ctx->events;
-        SYLAR_ASSERT(!(fd_ctx->events & event));
+                    <<  " fd_event = " << fd_ctx->m_events;
+        SYLAR_ASSERT(!(fd_ctx->m_events & event));
     }
 
     //判断新加还是修改
     int op = fd_ctx->m_events ? EPOLL_CTL_MOD : EPOLL_CTL_ADD;
     epoll_event epevent;
 
-    epevent.events = EPOLLET | fd_ctx->events | event;  //新的事件
+    epevent.events = EPOLLET | fd_ctx->m_events | event;  //新的事件
     epevent.data.ptr = fd_ctx;        //时间数据赋值
 
     int rt = epoll_ctl(m_epfd, op, fd, &epevent);    //事件加载进epoll里
@@ -143,10 +144,10 @@ int IOManager::addEvent(int fd, Event event, std::function<void()> cb = nullptr)
 
     event_ctx.scheduler = Scheduler::GetThis();
     if(cb) {
-        context.cb.swap(cb);
+        event_ctx.cb.swap(cb);
     }else {
-        context.fiber = Fiber::GetThis();
-        SYLAR_ASSERT(context.fiber->getState() == Fiber::EXEC);    //赋值协程时，协程的状态应该是正在执行中
+        event_ctx.fiber = Fiber::GetThis();
+        SYLAR_ASSERT(event_ctx.fiber->getState() == Fiber::EXEC);    //赋值协程时，协程的状态应该是正在执行中
     }
     return 0;
 }
@@ -154,8 +155,8 @@ int IOManager::addEvent(int fd, Event event, std::function<void()> cb = nullptr)
 
 
 bool IOManager::delEvent(int fd, Event event) {   // 直接把事件删除
-    MutexType::ReadLock lock(m_mutex);
-    if(m_fdContexts.size() <= fd){   //判断要删除的数据任务的大小是否满足和自己context的大小
+    RWMutexType::ReadLock lock(m_mutex);
+    if((int)m_fdContexts.size() <= fd){   //判断要删除的数据任务的大小是否满足和自己context的大小
         return false;
     }
     FdContext* fd_ctx = m_fdContexts[fd];
@@ -188,8 +189,8 @@ bool IOManager::delEvent(int fd, Event event) {   // 直接把事件删除
 }
 
 bool IOManager::cancelEvent(int fd, Event event) {      // 根据条件来触发该事件
-    MutexType::ReadLock lock(m_mutex);
-    if(m_fdContexts.size() <= fd){   //判断要删除的数据任务的大小是否满足和自己context的大小
+    RWMutexType::ReadLock lock(m_mutex);
+    if((int)m_fdContexts.size() <= fd){   //判断要删除的数据任务的大小是否满足和自己context的大小
         return false;
     }
     FdContext* fd_ctx = m_fdContexts[fd];
@@ -222,8 +223,8 @@ bool IOManager::cancelEvent(int fd, Event event) {      // 根据条件来触发
 //把该句柄下的所有任务，所有事件全部取消
 //event 事件必须是自己找到的的对应event
 bool IOManager::cancelAll(int fd) {
-    MutexType::ReadLock lock(m_mutex);
-    if(m_fdContexts.size() <= fd){   //判断要删除的数据任务的大小是否满足和自己context的大小
+    RWMutexType::ReadLock lock(m_mutex);
+    if((int)m_fdContexts.size() <= fd){   //判断要删除的数据任务的大小是否满足和自己context的大小
         return false;
     }
     FdContext* fd_ctx = m_fdContexts[fd];
@@ -233,6 +234,7 @@ bool IOManager::cancelAll(int fd) {
     if(!fd_ctx->m_events) {       //没有该事件
         return false;
     }
+
     int op = EPOLL_CTL_DEL;
     epoll_event epevent;     //事件结构体
     epevent.events = 0;
@@ -257,7 +259,7 @@ bool IOManager::cancelAll(int fd) {
     return true;
 }
 
-IOManager IOManager::*GetThis(){   // 获取当前的IOManager
+IOManager* IOManager::GetThis(){   // 获取当前的IOManager
     return dynamic_cast<IOManager*>(Scheduler::GetThis());
 }
 
@@ -277,14 +279,17 @@ bool IOManager::stopping() {
 }
 
 void IOManager::idle() {
-    epoll_event* events = new epoll_event[64]();
+    SYLAR_LOG_DEBUG(g_logger) << "idle";
+    const uint64_t MAX_EVENTS = 256;
+    epoll_event* events = new epoll_event[MAX_EVENTS]();
     std::shared_ptr<epoll_event>   shared_events(events,[](epoll_event* ptr){   //C++11不支持智能指针传递数组，但C++14支持,这里是用析构的方法实现存储
-        delete[] events;
+        delete[] ptr;
     });
 
     while(true) {
+       //uint64_t next_timeout = 0;
         if(stopping()){
-            SYLAR_LOG_INFO(g_logger) << "name = " << m_name << " idle stoppint exit";
+            SYLAR_LOG_INFO(g_logger) << "name = " << getName() << " idle stopping exit";
             break;
         }
 
@@ -303,14 +308,15 @@ void IOManager::idle() {
 
         for(int i=0; i < rt ;++i){
             epoll_event& event = events[i];
+            //SYLAR_LOG_INFO(g_logger) << event.data.fd;
             if(event.data.fd == m_tickleFds[0]) {
-                uint8_t dummy;
-                while(read(m_tickleFds[0],&dummy,1));    //必须读干净，不然不会通知了
+                uint8_t dummy[256];
+                while(read(m_tickleFds[0],&dummy,1) > 0);    //必须读干净，不然不会通知了
                 continue;
             }
 
-            FdContext* fd_ctx = event.data.ptr;
-            FdContext::MutexType::Lock lock(fd_ctx->m_mutex);
+            FdContext* fd_ctx = (FdContext*)event.data.ptr;
+            FdContext::MutexType::Lock lock(fd_ctx->mutex);
             if(event.events && (EPOLLERR | EPOLLHUP)) {      //如果是错误或者是中断的话，就需要修改events
                 event.events |= EPOLLIN | EPOLLOUT;
             }
@@ -323,11 +329,11 @@ void IOManager::idle() {
                 real_events |= WRITE;
             }
 
-            if((fd_ctx->events & real_events) == NONE) {
+            if((fd_ctx->m_events & real_events) == NONE) {
                 continue;
             }
 
-            int left_events = (fd_ctx->events & ~real_events);      //剩余事件
+            int left_events = (fd_ctx->m_events & ~real_events);      //剩余事件
             int op = left_events ? EPOLL_CTL_MOD : EPOLL_CTL_DEL;
             event.events = EPOLLET | left_events;
 
@@ -360,4 +366,6 @@ void IOManager::idle() {
     }
 }
 
+
 }
+
